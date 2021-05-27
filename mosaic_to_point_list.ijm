@@ -18,11 +18,12 @@
  * Date: 2021-05
  * 
  * To do:
- * - verify tile overlap
+ * - Save table in separete folder
+ * 
  */
+
 run("Bio-Formats Macro Extensions");
 print("\\Clear");
-close("*");
 run("Set Measurements...", "area mean centroid shape limit redirect=None decimal=4");
 
 // paths
@@ -31,14 +32,18 @@ list_files = getFileList(input);
 output = input + File.separator + "post_processing_analysis";
 File.makeDirectory(output);
 
-start_time = getTime();
+// path to tables
+path_table_folder = input + File.separator + "centroids_table";
+if (File.isDirectory(path_table_folder) == 0) {
+	File.makeDirectory(path_table_folder);
+}
 
 // user input variables
 Dialog.create("Variables");
-Dialog.addNumber("Calculated threshold", 498);
-Dialog.addNumber("Upper left X coordinate", 10098.0);
-Dialog.addNumber("Upper left Y coordinate", 38285.0);
-Dialog.addNumber("Z value", 5790.5);
+Dialog.addNumber("Calculated threshold", 374);
+Dialog.addNumber("Upper left X coordinate", 10648.0);
+Dialog.addNumber("Upper left Y coordinate", 26032.0);
+Dialog.addNumber("Z value", 5803.2);
 Dialog.show();
 good_thresh = Dialog.getNumber();
 x_input = Dialog.getNumber();
@@ -49,7 +54,7 @@ real_start_coordinates = newArray(x_input, y_input);
 // static variables
 n_size_array = getMosaicImagesCountAndImageSize(list_files);
 number_images = n_size_array[0];
-image_size = n_size_array[1];
+image_size = n_size_array[1] - (0.015 * n_size_array[1]); // 1.5 % of overlay between tiles
 counter = 0;
 
 // spiral mosaic variables 
@@ -60,9 +65,12 @@ start_index = floor(sqrt_total_images / 2);
 index_x = 0;
 index_y = start_index;
 
-// run everything. Ai minha nossa senhora! (translation: oh dear lord!)
+// run everything. Ai minha nossa senhora!
+
+start_time = getTime();
+
 setBatchMode("hide");
-processMosaic(list_files, output);
+processMosaic(list_files, output, path_table_folder);
 
 end_time = getTime();
 runtime(start_time, end_time);
@@ -89,7 +97,7 @@ function getMosaicImagesCountAndImageSize(list_files) {
 }
 
 
-function processMosaic(list_files, output) {
+function processMosaic(list_files, output, path_table_folder) {
 	// ui, que isto faz muita coisa. e recolhe centroids.
 	for (j = 0; j < list_files.length; j++) {
 		current_file = list_files[j];
@@ -102,21 +110,19 @@ function processMosaic(list_files, output) {
 			
 			goThroughMosaic(index_x, index_y, sqrt_total_images, image_size, real_start_coordinates, counter);
 			
-			Table.save(output + File.separator + File.getNameWithoutExtension(path_current) + "_point_list.csv");
+			Table.save(path_table_folder + File.separator + File.getNameWithoutExtension(path_current) + "_point_list.csv");
 			selectWindow("Log");
 			saveAs("txt", output + File.separator + File.getNameWithoutExtension(path_current) + "_log_centroid.desktop");
 
 			// write point list desktop txt file
-			choice = getBoolean("Write txt file? this is only for testing purposes");
-			if (choice) {
-				print("\\Clear");
-				for (b = 0; b < Table.size; b++) {
-					x_value = round(Table.get("centroid_x", b) * 10) / 10;
-					y_value = round(Table.get("centroid_y", b) * 10) / 10;
-					print((b+1) + ": " + x_value + ", " + y_value + ", " + z_value);
-				}
-				selectWindow("Log");
-				saveAs("txt", output + File.separator + File.getNameWithoutExtension(path_current) + "_point_list.desktop");
+			print("\\Clear");
+			for (b = 0; b < Table.size; b++) {
+				x_value = round(Table.get("centroid_x", b) * 10) / 10;
+				y_value = round(Table.get("centroid_y", b) * 10) / 10;
+				print((b+1) + ": " + x_value + ", " + y_value + ", " + z_value);
+			
+			selectWindow("Log");
+			saveAs("txt", output + File.separator + File.getNameWithoutExtension(path_current) + "_point_list_desktop");
 			}
 		}
 	}
@@ -261,7 +267,7 @@ function processImageAddCentroids(path_current, good_thresh, counter, index_x, i
 		roi_centroid_y = getResult("Y", i) / pixelHeight;
 	
 		// add to centroids table
-		Table.set("image", (last_index_table + i), img_name + "_centroid_" + (i+1));
+		Table.set("Image", (last_index_table + i), img_name + "_centroid_" + (i+1));
 		Table.set("centroid_x", (last_index_table + i), new_centroid_x);
 		Table.set("centroid_y", (last_index_table + i), new_centroid_y);
 
@@ -269,19 +275,23 @@ function processImageAddCentroids(path_current, good_thresh, counter, index_x, i
 		makeOval(roi_centroid_x - 10, roi_centroid_y - 10, 20, 20);
 		roiManager("Add");
 		roiManager("select", roiManager("count") - 1);
-		roiManager("rename", "centroid_" + (i+1));		
+		roiManager("rename", "centroid_" + (i+1));
 	}
-
+	
 	// saving files
     if (roiManager("count") > 0) {
+    	masks_folder = output + File.separator + File.getNameWithoutExtension(path_current) + "_masks_folder";
+    	if (File.isDirectory(masks_folder) == 0) {
+    		File.makeDirectory(masks_folder);
+    	}
     	print("centroid was successfully added");
     	Overlay.remove;
     	Roi.remove;
-    	roiManager("save", output + File.separator + img_name + "_cell_and_centroid_ROIs.zip");
+    	roiManager("save", masks_folder + File.separator + img_name + "_cell_and_centroid_ROIs.zip");
     	roiManager("deselect");
     	roiManager("delete");
     	selectWindow(mask_img);
-    	saveAs("TIFF", output + File.separator + img_name + "_cell_mask.tif");
+    	saveAs("TIFF", masks_folder + File.separator + img_name + "_cell_mask.tif");
     }			    
     run("Clear Results");
 	close("*");
