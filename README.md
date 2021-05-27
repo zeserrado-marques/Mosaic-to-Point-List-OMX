@@ -6,16 +6,15 @@ ImageJ macro code that:
 
 Current workflow only identifies transfected from non-transfected cells.
 
-##### Needed inputs:
+#### Needed inputs:
 - X, Y and Z values of mosaic's upper left stage coordinates
 - Directory (folder) containing only a single .dv file that must be the mosaic image.
 - Calcuted threshold using _mean_plus_StdDev_threshold.ijm_ into _mosaic_to_point_list.ijm_
 
-##### Dependencies:
+#### Dependencies:
 - Bio-formats
 
-##### Future work:
+#### Future work:
 - Handle more than one Mosaic image.
-- Concatenate multiple point lists files into a single one
 
 Please cite if you used it. Thanks :D
