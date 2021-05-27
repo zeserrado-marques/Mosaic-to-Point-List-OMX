@@ -6,7 +6,7 @@ ImageJ macro code that:
 
 Current workflow only identifies transfected from non-transfected cells.
 
-*._single_file* macros will open only the mosaic file. Meaning that you can have more than one mosaic images in the same folder.
+*_single_file* macros will open only the mosaic file. Meaning that you can have more than one mosaic images in the same folder.
 
 #### Needed inputs:
 - X, Y and Z values of mosaic's upper left stage coordinates
