@@ -17,8 +17,6 @@
  * Version: v1.0
  * Date: 2021-05
  * 
- * To do:
- * - Save table in separete folder
  * 
  */
 
@@ -64,7 +62,7 @@ start_index = floor(sqrt_total_images / 2);
 // start indexes
 index_x = 0;
 index_y = start_index;
-
+
 // run everything. Ai minha nossa senhora!
 
 start_time = getTime();
@@ -111,6 +109,7 @@ function processMosaic(list_files, output, path_table_folder) {
 			goThroughMosaic(index_x, index_y, sqrt_total_images, image_size, real_start_coordinates, counter);
 			
 			Table.save(path_table_folder + File.separator + File.getNameWithoutExtension(path_current) + "_point_list.csv");
+			// save processing log
 			selectWindow("Log");
 			saveAs("txt", output + File.separator + File.getNameWithoutExtension(path_current) + "_log_centroid.desktop");
 
