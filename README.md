@@ -6,12 +6,13 @@ ImageJ macro code that:
 
 Current workflow only identifies transfected from non-transfected cells.
 
-*_single_file* macros will open only the mosaic file. Meaning that you can have more than one mosaic images in the same folder.
+*single_file* macros will open only the mosaic file. Meaning that you can have more than one mosaic images in the same folder.
 
 #### Needed inputs:
 - X, Y and Z values of mosaic's upper left stage coordinates
 - Directory (folder) containing only a single .dv file that must be the mosaic image.
-- Calcuted threshold using _mean_plus_StdDev_threshold.ijm_ into _mosaic_to_point_list.ijm_
+  - If you use the _single_file_ macros, make sure that all mosaic images stay in the same directory/folder.
+- Calculated threshold using _mean_plus_StdDev_threshold.ijm_ into _mosaic_to_point_list.ijm_
 
 #### Dependencies:
 - Bio-formats
