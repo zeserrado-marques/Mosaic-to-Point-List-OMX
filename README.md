@@ -6,7 +6,7 @@ ImageJ macro code that:
 
 Current workflow only identifies transfected from non-transfected cells.
 
-*single_file* macros will open only the mosaic file. Meaning that you can have more than one mosaic images in the same folder.
+*single_file* macros will open only one mosaic file. Meaning that you can have more than one mosaic images in the same folder.
 
 #### Needed inputs:
 - X, Y and Z values of mosaic's upper left stage coordinates
@@ -19,3 +19,9 @@ Current workflow only identifies transfected from non-transfected cells.
 
 
 Please cite if you used it. Thanks :D
+
+### Update
+
+#### 2020/06/09
+- *single_file* macros output a folder called *centroids_tables_single_file* (name may change later. Feel free to also change the name of the output folder in the source code if you know ImageJ macro).
+- *concatenate_point_lists.ijm* will open that folder and concatenate the centroid tables into one big point list to be used in OMX.
