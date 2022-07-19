@@ -36,4 +36,4 @@ Please cite:
 - and this repo if you used it.
 
 Thanks :D
-Hope it was useful
+Hope it's useful
